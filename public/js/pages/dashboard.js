@@ -26,7 +26,7 @@ const LEVELS = [
     },
     {
         max: 375,
-        img: '2.png',
+        img: '3.png',
         label: 'Fuoco',
         desc: 'Il sistema si fida di te',
         color: '#ef4444',
@@ -35,7 +35,7 @@ const LEVELS = [
     },
     {
         max: 500,
-        img: '1.png',
+        img: '4.png',
         label: 'Calcifer',
         desc: 'Credibilità massima',
         color: '#be123c',
