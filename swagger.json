@@ -1,0 +1,363 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Calcifer P2P API",
+    "description": "Documentazione ufficiale delle API per la piattaforma di micro-credito Calcifer. Tutti gli endpoint protetti richiedono un token JWT nell'header Authorization: Bearer <token>.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://calcifer.lorenzoo.it/api",
+      "description": "Server di Produzione"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id":           { "type": "integer", "example": 1 },
+          "username":     { "type": "string",  "example": "howl" },
+          "email":        { "type": "string",  "example": "howl@calcifer.com" },
+          "role":         { "type": "string",  "enum": ["howl", "calcifer"], "example": "howl" },
+          "credit_score": { "type": "integer", "example": 300 },
+          "balance":      { "type": "number",  "example": 1500.00 }
+        }
+      },
+      "Loan": {
+        "type": "object",
+        "properties": {
+          "id":              { "type": "integer", "example": 42 },
+          "howl_id":         { "type": "integer", "example": 1 },
+          "username":        { "type": "string",  "example": "howl" },
+          "amount":          { "type": "number",  "example": 500.00 },
+          "reason":          { "type": "string",  "example": "Acquisto materiale universitario" },
+          "interest_rate":   { "type": "number",  "example": 6.50 },
+          "duration_months": { "type": "integer", "example": 12 },
+          "status":          { "type": "string",  "enum": ["pending", "funded", "active", "closed"], "example": "pending" },
+          "created_at":      { "type": "string",  "format": "date-time", "example": "2026-03-01T10:00:00Z" }
+        }
+      },
+      "Investment": {
+        "type": "object",
+        "properties": {
+          "id":              { "type": "integer", "example": 7 },
+          "calcifer_id":     { "type": "integer", "example": 2 },
+          "loan_id":         { "type": "integer", "example": 42 },
+          "amount_invested": { "type": "number",  "example": 500.00 }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "example": "descrizione errore" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth.php": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Registrazione o Login",
+        "description": "Endpoint unificato per la gestione dell'autenticazione. Il campo `action` determina l'operazione: `login` restituisce un token JWT, `register` crea un nuovo account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "title": "Login",
+                    "type": "object",
+                    "required": ["action", "email", "password"],
+                    "properties": {
+                      "action":   { "type": "string", "enum": ["login"] },
+                      "email":    { "type": "string", "example": "howl@calcifer.com" },
+                      "password": { "type": "string", "example": "password123" }
+                    }
+                  },
+                  {
+                    "title": "Register",
+                    "type": "object",
+                    "required": ["action", "username", "email", "password"],
+                    "properties": {
+                      "action":   { "type": "string", "enum": ["register"] },
+                      "username": { "type": "string", "example": "howl" },
+                      "email":    { "type": "string", "example": "howl@calcifer.com" },
+                      "password": { "type": "string", "example": "password123" },
+                      "role":     { "type": "string", "enum": ["howl", "calcifer"], "default": "howl", "description": "Ruolo utente: howl = richiedente, calcifer = investitore" }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login riuscito — token JWT e dati utente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id":       { "type": "integer", "example": 1 },
+                        "username": { "type": "string",  "example": "howl" },
+                        "role":     { "type": "string",  "example": "howl" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Registrazione completata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "registrazione completata" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Dati mancanti o email non valida",           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "401": { "description": "Credenziali non valide",                      "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "409": { "description": "Email o username gia in uso",                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/users.php": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Profilo utente autenticato",
+        "description": "Restituisce id, username, email, ruolo, credit score e saldo dell'utente associato al token JWT.",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "action",
+            "required": true,
+            "schema": { "type": "string", "enum": ["me"] },
+            "example": "me"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dati profilo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": { "description": "Token mancante o non valido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Utente non trovato",          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/loans.php": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "Feed prestiti disponibili",
+        "description": "Restituisce la lista dei prestiti in stato `pending`, ordinati per data di creazione decrescente. Limite massimo 50 risultati.",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "action",
+            "required": true,
+            "schema": { "type": "string", "enum": ["feed"] },
+            "example": "feed"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista prestiti disponibili",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Loan" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token mancante o non valido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Loans"],
+        "summary": "Crea richiesta di prestito o recupera dettaglio",
+        "description": "Con `action: create` apre una nuova pratica di prestito. Il tasso di interesse viene calcolato automaticamente dal credit score del richiedente con la formula `max(3, 15 - score/20)`. Con `action: detail` recupera i dati di un singolo prestito.",
+        "security": [ { "bearerAuth": [] } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "title": "Crea prestito",
+                    "type": "object",
+                    "required": ["action", "amount", "reason", "duration_months"],
+                    "properties": {
+                      "action":          { "type": "string", "enum": ["create"] },
+                      "amount":          { "type": "number",  "example": 500.00, "minimum": 1 },
+                      "reason":          { "type": "string",  "example": "Acquisto laptop per universita" },
+                      "duration_months": { "type": "integer", "example": 12, "minimum": 1 }
+                    }
+                  },
+                  {
+                    "title": "Dettaglio prestito",
+                    "type": "object",
+                    "required": ["action", "id"],
+                    "properties": {
+                      "action": { "type": "string", "enum": ["detail"] },
+                      "id":     { "type": "integer", "example": 42 }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dettaglio singolo prestito",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Loan" }
+              }
+            }
+          },
+          "201": {
+            "description": "Prestito creato — include il tasso calcolato",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message":       { "type": "string", "example": "richiesta creata" },
+                    "interest_rate": { "type": "number", "example": 6.50 }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Dati mancanti o non validi",  "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "401": { "description": "Token mancante o non valido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Prestito non trovato",        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/investments.php": {
+      "post": {
+        "tags": ["Investments"],
+        "summary": "Finanzia un prestito",
+        "description": "Registra l'investimento di un utente Calcifer su una pratica in stato `pending` e aggiorna lo stato del prestito a `funded`. Non e' possibile finanziare il proprio stesso prestito.",
+        "security": [ { "bearerAuth": [] } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action", "loan_id", "amount"],
+                "properties": {
+                  "action":  { "type": "string",  "enum": ["invest"] },
+                  "loan_id": { "type": "integer", "example": 42 },
+                  "amount":  { "type": "number",  "example": 500.00, "minimum": 0.01 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Investimento completato",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "investimento completato con successo" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Dati mancanti o prestito non piu disponibile", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "401": { "description": "Token mancante o non valido",                  "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "403": { "description": "Tentativo di finanziare il proprio prestito",  "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Prestito non trovato",                          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/dashboard.php": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Analytics utente",
+        "description": "Restituisce statistiche incrociate per l'utente autenticato: totale richieste e importo ricevuto come Howl, totale investimenti e capitale investito come Calcifer.",
+        "security": [ { "bearerAuth": [] } ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "action",
+            "required": true,
+            "schema": { "type": "string", "enum": ["analytics"] },
+            "example": "analytics"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiche utente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "howl_stats": {
+                      "type": "object",
+                      "properties": {
+                        "total_requests": { "type": "integer", "example": 3 },
+                        "total_borrowed": { "type": "number",  "example": 1500.00 }
+                      }
+                    },
+                    "calcifer_stats": {
+                      "type": "object",
+                      "properties": {
+                        "total_investments": { "type": "integer", "example": 5 },
+                        "total_invested":    { "type": "number",  "example": 2500.00 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token mancante o non valido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    }
+  }
+}

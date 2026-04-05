@@ -1,0 +1,14 @@
+{
+    "name": "Calcifer",
+    "short_name": "Calcifer",
+    "description": "Peer-to-peer lending platform",
+    "start_url": "/?p=dashboard",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f6f6f8",
+    "theme_color": "#f6f6f8",
+    "icons": [
+      { "src": "/logo_clean.png", "sizes": "192x192", "type": "image/png" },
+      { "src": "/logo_clean.png", "sizes": "512x512", "type": "image/png" }
+    ]
+}

@@ -1,0 +1,19 @@
+Options -Indexes
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+<FilesMatch "\.(css|js)$">
+  Header set Cache-Control "no-store, no-cache, must-revalidate"
+  Header set Pragma "no-cache"
+</FilesMatch>
+
+<FilesMatch "\.(png|jpg|svg|ico|webp|woff2)$">
+  Header set Cache-Control "public, max-age=604800"
+</FilesMatch>
+
+<FilesMatch "\.php$">
+  Header set Cache-Control "no-store"
+</FilesMatch>
