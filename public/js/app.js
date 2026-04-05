@@ -66,15 +66,11 @@ function populateUser() {
     const user = userStore.get();
     if (!user) return;
     const initials = fmt.initials(user.username);
-
     const sideAvatar = document.getElementById('sidebar-avatar');
     const topAvatar  = document.getElementById('topbar-avatar');
     const sideUser   = document.getElementById('sidebar-username');
-
     if (sideUser) sideUser.textContent = user.username;
-
     if (sideAvatar) sideAvatar.textContent = initials;
-
     if (topAvatar) {
         if (user.avatar_url) {
             topAvatar.style.padding = '0';
@@ -84,7 +80,6 @@ function populateUser() {
             topAvatar.textContent = initials;
         }
     }
-
     if (!user.avatar_url) {
         import('./api.js').then(({ Users }) => {
             Users.me().then(fresh => {
@@ -98,49 +93,43 @@ function populateUser() {
         });
     }
 }
-
 function bindLogout() {
     document.getElementById('sidebar-logout')?.addEventListener('click', () => Auth.logout());
 }
 
 // notifications
 let notifModal = null;
-
 function renderNotifModal(notifications) {
     if (notifModal) notifModal.remove();
-
     const unread = notifications.filter(n => !n.is_read).length;
-
     const backdrop = document.createElement('div');
     backdrop.className = 'modal-backdrop';
     backdrop.innerHTML = `
-      <div class="modal" style="gap:0;padding:0;overflow:hidden;max-height:82dvh">
-
+    <div class="modal" style="gap:0;padding:0;overflow:hidden;max-height:82dvh">
         <div style="flex-shrink:0">
-          <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0"></div>
-          <div style="padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:1rem;font-weight:800;letter-spacing:-.025em">Notifiche</span>
-              ${unread > 0 ? `<span style="background:var(--accent);color:#fff;font-size:.5625rem;font-weight:800;padding:2px 7px;border-radius:999px">${unread}</span>` : ''}
+            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0"></div>
+                <div style="padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:1rem;font-weight:800;letter-spacing:-.025em">Notifiche</span>
+                    ${unread > 0 ? `<span style="background:var(--accent);color:#fff;font-size:.5625rem;font-weight:800;padding:2px 7px;border-radius:999px">${unread}</span>` : ''}
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    ${notifications.length > 0 ? `<button id="clear-all-notif" style="font-size:.8125rem;font-weight:700;color:var(--ink-3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:8px;font-family:var(--sans);transition:color .12s" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--ink-3)'">Cancella tutto</button>` : ''}
+                    <button id="close-notif-btn" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--surface-3);color:var(--ink-2);cursor:pointer;border:none">
+                    <span class="ms ms-sm" style="font-size:16px">close</span>
+                    </button>
+                </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              ${notifications.length > 0 ? `<button id="clear-all-notif" style="font-size:.8125rem;font-weight:700;color:var(--ink-3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:8px;font-family:var(--sans);transition:color .12s" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--ink-3)'">Cancella tutto</button>` : ''}
-              <button id="close-notif-btn" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--surface-3);color:var(--ink-2);cursor:pointer;border:none">
-                <span class="ms ms-sm" style="font-size:16px">close</span>
-              </button>
-            </div>
-          </div>
         </div>
-
         <div style="overflow-y:auto;flex:1;padding:0 12px 16px;display:flex;flex-direction:column;gap:8px" id="notif-list-inner">
           ${notifications.length === 0
             ? `<div style="display:flex;flex-direction:column;align-items:center;padding:48px 20px;color:var(--ink-3);text-align:center">
-                 <span class="ms" style="font-size:44px">notifications_none</span>
-                 <p style="margin-top:8px;font-size:.875rem;font-weight:600">Tutto letto</p>
+                    <span class="ms" style="font-size:44px">notifications_none</span>
+                    <p style="margin-top:8px;font-size:.875rem;font-weight:600">Tutto letto</p>
                </div>`
             : notifications.map(n => notifCard(n)).join('')}
         </div>
-      </div>`;
+    </div>`;
 
     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeNotifModal(); });
     backdrop.querySelector('#close-notif-btn').addEventListener('click', closeNotifModal);
@@ -178,7 +167,6 @@ function renderNotifModal(notifications) {
     document.body.appendChild(backdrop);
     notifModal = backdrop;
 }
-
 function notifCard(n) {
     const CFG = {
         new_message:       { icon:'chat',      bg:'#f8fafc', border:'#e2e8f0', iconBg:'var(--accent)',  iconColor:'#fff' },
@@ -192,41 +180,39 @@ function notifCard(n) {
 
     const leftEl = isMsg
         ? `<div style="width:42px;height:42px;border-radius:50%;overflow:hidden;position:relative;background:#e4e4e7;flex-shrink:0;display:flex;align-items:center;justify-content:center">
-             <span style="font-size:.625rem;font-weight:800;color:#71717a;text-transform:uppercase;position:absolute">${fmt.initials(n.title)}</span>
-             <img src="${n.image_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="">
-           </div>`
+                <span style="font-size:.625rem;font-weight:800;color:#71717a;text-transform:uppercase;position:absolute">${fmt.initials(n.title)}</span>
+                <img src="${n.image_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            </div>`
         : `<div style="width:42px;height:42px;border-radius:14px;flex-shrink:0;background:${CFG.iconBg};display:flex;align-items:center;justify-content:center">
-             <span class="ms ms-sm" style="color:${CFG.iconColor};font-size:20px">${CFG.icon}</span>
+                <span class="ms ms-sm" style="color:${CFG.iconColor};font-size:20px">${CFG.icon}</span>
            </div>`;
 
     return `
-      <div class="notif-card" data-link="${n.link || ''}" data-id="${n.id}" style="
+        <div class="notif-card" data-link="${n.link || ''}" data-id="${n.id}" style="
         background:${n.is_read ? '#f3f3f352' : CFG.bg};
         border:1.5px solid ${n.is_read ? '#f0f0f0' : CFG.border};
         border-radius:18px;padding:14px;
         cursor:pointer;position:relative;
         transition:transform .12s,box-shadow .12s;
-      " onmouseenter="this.style.transform='scale(1.008)';this.style.boxShadow='0 2px 12px rgba(0,0,0,.07)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+        " onmouseenter="this.style.transform='scale(1.008)';this.style.boxShadow='0 2px 12px rgba(0,0,0,.07)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
 
         <div style="display:flex;align-items:flex-start;gap:12px">
-          ${leftEl}
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:3px">
-              <span style="font-size:.9375rem;font-weight:${n.is_read ? 600 : 800};color:${n.is_read ? '#71717a' : '#09090b'};letter-spacing:-.01em;line-height:1.3">${n.title}</span>
+            ${leftEl}
+            <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:3px">
+                    <span style="font-size:.9375rem;font-weight:${n.is_read ? 600 : 800};color:${n.is_read ? '#71717a' : '#09090b'};letter-spacing:-.01em;line-height:1.3">${n.title}</span>
+                </div>
+                <div style="font-size:.8125rem;color:#71717a;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.body}</div>
             </div>
-            <div style="font-size:.8125rem;color:#71717a;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.body}</div>
-          </div>
         </div>
 
         ${!n.is_read ? `<div style="position:absolute;top:12px;right:12px;width:7px;height:7px;border-radius:50%;background:${CFG.iconBg}"></div>` : ''}
       </div>`;
 }
-
 function closeNotifModal() {
     notifModal?.remove();
     notifModal = null;
 }
-
 function notifIcon(type) {
     const map = {
         new_proposal:       'handshake',
@@ -237,7 +223,6 @@ function notifIcon(type) {
     };
     return map[type] ?? 'notifications';
 }
-
 async function pollNotifications() {
     try {
         const data   = await Notifications.list();
@@ -249,7 +234,6 @@ async function pollNotifications() {
         if (topBadge) topBadge.textContent = unread > 0 ? unread : '';
     } catch (_) {}
 }
-
 function bindNotifications() {
     const btn = document.getElementById('notif-btn');
     if (!btn) return;
@@ -275,7 +259,6 @@ function init() {
     bindLogout();
     bindNotifications();
 }
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
@@ -284,13 +267,11 @@ if (document.readyState === 'loading') {
 
 // PWA install banner TODO: test iOS per ora android only
 let _deferredPrompt = null;
- 
 window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredPrompt = e;
     showInstallBanner();
 });
- 
 function showInstallBanner() {
     if (document.getElementById('__pwa_banner')) return;
     const p = new URLSearchParams(location.search).get('p') || 'dashboard';

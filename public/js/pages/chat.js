@@ -36,9 +36,9 @@ document.getElementById('notif-btn-chat')?.addEventListener('click', async () =>
 
 function openNotifSheet(list) {
     document.getElementById('__ns')?.remove();
-    const icons = { new_proposal:'handshake', proposal_accepted:'check_circle', proposal_rejected:'cancel', new_message:'chat', loan_funded:'payments' };
-    const clr   = { new_proposal:'#f59e0b', proposal_accepted:'#16a34a', proposal_rejected:'#dc2626', new_message:'var(--accent)', loan_funded:'#16a34a' };
-    const bgClr = { new_proposal:'#fef3c7', proposal_accepted:'#dcfce7', proposal_rejected:'#fee2e2', new_message:'hsla(351,80%,44%,.1)', loan_funded:'#dcfce7' };
+    const icons  = { new_proposal:'handshake', proposal_accepted:'check_circle', proposal_rejected:'cancel', new_message:'chat', loan_funded:'payments' };
+    const clr    = { new_proposal:'#f59e0b', proposal_accepted:'#16a34a', proposal_rejected:'#dc2626', new_message:'var(--accent)', loan_funded:'#16a34a' };
+    const bgClr  = { new_proposal:'#fef3c7', proposal_accepted:'#dcfce7', proposal_rejected:'#fee2e2', new_message:'hsla(351,80%,44%,.1)', loan_funded:'#dcfce7' };
     const unread = list.filter(n => !n.is_read).length;
 
     const el = document.createElement('div');
@@ -47,37 +47,38 @@ function openNotifSheet(list) {
     el.innerHTML = `
         <div id="__ns_bg" style="position:absolute;inset:0;background:rgba(0,0,0,.42);backdrop-filter:blur(6px)"></div>
         <div style="position:relative;background:#fff;border-radius:24px 24px 0 0;max-height:78dvh;display:flex;flex-direction:column;box-shadow:0 -4px 40px rgba(0,0,0,.14)">
-        <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0;flex-shrink:0"></div>
-        <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid #f4f4f5">
-            <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:1.125rem;font-weight:800;letter-spacing:-.03em">Notifiche</span>
-            ${unread > 0 ? `<span style="background:var(--accent);color:#fff;font-size:.625rem;font-weight:800;padding:3px 9px;border-radius:999px">${unread} nuove</span>` : ''}
+            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0;flex-shrink:0"></div>
+            <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid #f4f4f5">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-size:1.125rem;font-weight:800;letter-spacing:-.03em">Notifiche</span>
+                    ${unread > 0 ? `<span style="background:var(--accent);color:#fff;font-size:.625rem;font-weight:800;padding:3px 9px;border-radius:999px">${unread} nuove</span>` : ''}
+                </div>
+                <button id="__ns_x" style="width:28px;height:28px;border-radius:50%;background:#f4f4f5;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
+                    <span class="ms ms-sm" style="font-size:16px;color:#71717a">close</span>
+                </button>
             </div>
-            <button id="__ns_x" style="width:28px;height:28px;border-radius:50%;background:#f4f4f5;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
-            <span class="ms ms-sm" style="font-size:16px;color:#71717a">close</span>
-            </button>
-        </div>
-        <div style="overflow-y:auto;flex:1">
-            ${!list.length
-            ? `<div style="text-align:center;padding:48px 20px;color:#a1a1aa"><span class="ms" style="font-size:44px">notifications_none</span><p style="margin-top:8px;font-size:.875rem;font-weight:600">Nessuna notifica</p></div>`
-            : list.map(n => {
-                const ic = icons[n.type] ?? 'notifications';
-                const co = clr[n.type]   ?? '#a1a1aa';
-                const bg = bgClr[n.type] ?? '#f4f4f5';
-                return `
-                <div class="__nr" data-link="${n.link}" data-id="${n.id}" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;cursor:pointer;border-bottom:1px solid #f9f9f9;background:${n.is_read?'transparent':'rgba(225,29,72,.03)'};transition:background .1s;position:relative">
-                    ${!n.is_read ? `<div style="position:absolute;left:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent)"></div>` : ''}
-                    <div style="width:44px;height:44px;border-radius:14px;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <span class="ms" style="font-size:20px;color:${co}">${ic}</span>
-                    </div>
-                    <div style="flex:1;min-width:0">
-                    <div style="font-size:.9375rem;font-weight:${n.is_read?600:800};color:${n.is_read?'#71717a':'#09090b'}">${n.title}</div>
-                    <div style="font-size:.8125rem;color:#71717a;margin-top:3px;line-height:1.4">${n.body}</div>
-                    <div style="font-size:.6875rem;color:#a1a1aa;margin-top:6px;font-weight:600">${fmt.relTime(n.created_at)}</div>
-                    </div>
-                    ${n.link ? `<span class="ms ms-sm" style="color:#d4d4d8;margin-top:4px;flex-shrink:0">chevron_right</span>` : ''}
+            <div style="overflow-y:auto;flex:1">
+                ${!list.length
+                ? `
+                <div style="text-align:center;padding:48px 20px;color:#a1a1aa"><span class="ms" style="font-size:44px">notifications_none</span><p style="margin-top:8px;font-size:.875rem;font-weight:600">Nessuna notifica</p></div>`
+                    : list.map(n => {
+                    const ic = icons[n.type] ?? 'notifications';
+                    const co = clr[n.type]   ?? '#a1a1aa';
+                    const bg = bgClr[n.type] ?? '#f4f4f5';
+                    return `
+                        <div class="__nr" data-link="${n.link}" data-id="${n.id}" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;cursor:pointer;border-bottom:1px solid #f9f9f9;background:${n.is_read?'transparent':'rgba(225,29,72,.03)'};transition:background .1s;position:relative">
+                        ${!n.is_read ? `<div style="position:absolute;left:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent)"></div>` : ''}
+                        <div style="width:44px;height:44px;border-radius:14px;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            <span class="ms" style="font-size:20px;color:${co}">${ic}</span>
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:.9375rem;font-weight:${n.is_read?600:800};color:${n.is_read?'#71717a':'#09090b'}">${n.title}</div>
+                            <div style="font-size:.8125rem;color:#71717a;margin-top:3px;line-height:1.4">${n.body}</div>
+                            <div style="font-size:.6875rem;color:#a1a1aa;margin-top:6px;font-weight:600">${fmt.relTime(n.created_at)}</div>
+                        </div>
+                        ${n.link ? `<span class="ms ms-sm" style="color:#d4d4d8;margin-top:4px;flex-shrink:0">chevron_right</span>` : ''}
                 </div>`;}).join('')}
-        </div>
+            </div>
         </div>`;
 
     el.querySelector('#__ns_bg').addEventListener('click', () => el.remove());
@@ -128,13 +129,13 @@ function renderHeader(chat) {
         : `<div style="${base}"><span style="${txt}">${ini}</span></div>`;
 
     document.getElementById('chat-hd-info').innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;min-width:0">
-        ${avatarHtml}
-        <div style="min-width:0">
-          <div style="font-weight:800;font-size:.9375rem;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@${chat.other_username}</div>
-          <div style="font-size:.6875rem;color:#a1a1aa;font-weight:600;margin-top:1px">${fmt.currency(chat.loan_amount)}</div>
-        </div>
-      </div>`;
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+            ${avatarHtml}
+            <div style="min-width:0">
+                <div style="font-weight:800;font-size:.9375rem;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@${chat.other_username}</div>
+                <div style="font-size:.6875rem;color:#a1a1aa;font-weight:600;margin-top:1px">${fmt.currency(chat.loan_amount)}</div>
+            </div>
+        </div>`;
 }
 
 function renderMessages(messages, chat) {
@@ -176,10 +177,11 @@ function renderMessages(messages, chat) {
             ? buildMiniAvatar(chat.other_avatar, chat.other_username)
             : `<div style="width:28px;flex-shrink:0"></div>`;
 
-        return `<div style="display:flex;align-items:flex-end;gap:6px;margin-top:${gap}">
-          ${avatarSlot}
-          ${inner}
-        </div>`;
+        return `
+            <div style="display:flex;align-items:flex-end;gap:6px;margin-top:${gap}">
+                ${avatarSlot}
+                ${inner}
+            </div>`;
     }).join('');
 
     msgsEl.querySelectorAll('[data-accept]').forEach(b =>
@@ -193,10 +195,11 @@ function buildMiniAvatar(avatarUrl, username) {
     const base = `width:28px;height:28px;border-radius:50%;flex-shrink:0;overflow:hidden;position:relative;background:#e4e4e7;display:flex;align-items:center;justify-content:center`;
     const txt  = `font-size:.4375rem;font-weight:800;color:#71717a;text-transform:uppercase`;
     if (avatarUrl) {
-        return `<div style="${base}">
-          <span style="${txt};position:absolute">${ini}</span>
-          <img src="${avatarUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="${ini}">
-        </div>`;
+        return `
+            <div style="${base}">
+                <span style="${txt};position:absolute">${ini}</span>
+                <img src="${avatarUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="${ini}">
+            </div>`;
     }
     return `<div style="${base}"><span style="${txt}">${ini}</span></div>`;
 }
@@ -206,9 +209,9 @@ function renderBubble(m, mine, radius = mine ? '20px 20px 5px 20px' : '20px 20px
         ? 'background:#09090b;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);'
         : 'background:#fff;border:1.5px solid #ebebeb;color:#09090b;box-shadow:0 1px 4px rgba(0,0,0,.06);';
     return `
-      <div style="display:flex;flex-direction:column;max-width:74%;${mine?'align-items:flex-end':'align-items:flex-start'}">
-        <div style="padding:11px 16px;border-radius:${radius};font-size:.9375rem;font-weight:500;line-height:1.5;word-break:break-word;${style}">${escHtml(m.content)}</div>
-      </div>`;
+        <div style="display:flex;flex-direction:column;max-width:74%;${mine?'align-items:flex-end':'align-items:flex-start'}">
+            <div style="padding:11px 16px;border-radius:${radius};font-size:.9375rem;font-weight:500;line-height:1.5;word-break:break-word;${style}">${escHtml(m.content)}</div>
+        </div>`;
 }
 
 function renderSystemMsg(content) {
@@ -219,14 +222,7 @@ function renderSystemMsg(content) {
         const match  = content.match(/€[\d.,]+/);
         const amount = match ? match[0] : '';
         return `
-            <div style="
-            display:flex;flex-direction:column;align-items:center;gap:12px;
-            background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-            border: 1.5px solid #16a34a47;
-            border-radius:20px;
-            padding:20px 24px;max-width:84%;text-align:center;
-            box-shadow:0 2px 12px rgba(22,163,74,.12);
-            ">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border: 1.5px solid #16a34a47;border-radius:20px;padding:20px 24px;max-width:84%;text-align:center;box-shadow:0 2px 12px rgba(22,163,74,.12);">
                 <div style="width:48px;height:48px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(22,163,74,.3)">
                     <span class="ms" style="color:#fff;font-size:26px">check_circle</span>
                 </div>
@@ -239,11 +235,7 @@ function renderSystemMsg(content) {
     }
     if (isRejected) {
         return `
-            <div style="
-            display:flex;align-items:center;gap:10px;
-            background:#fafafa;border:1.5px solid #ebebeb;border-radius:999px;
-            padding:9px 18px;max-width:84%;
-            ">
+            <div style="display:flex;align-items:center;gap:10px;background:#fafafa;border:1.5px solid #ebebeb;border-radius:999px;padding:9px 18px;max-width:84%;">
                 <div style="width:24px;height:24px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                     <span class="ms" style="color:#dc2626;font-size:14px">close</span>
                 </div>

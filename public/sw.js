@@ -1,5 +1,5 @@
-const VERSION   = 'v1.0.2';
-const CACHE     = `calcifer-${VERSION}`;
+const VERSION = 'v1.0.2';
+const CACHE = `calcifer-${VERSION}`;
 const API_PATHS = ['/api/'];
 
 const PRECACHE = [
@@ -106,25 +106,25 @@ self.addEventListener('fetch', e => {
 
 function offlinePage() {
     return new Response(`<!DOCTYPE html>
-<html lang="it">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>CALCIFER — Offline</title>
-        <style>
-            *{margin:0;padding:0;box-sizing:border-box}
-            body{font-family:-apple-system,'DM Sans',sans-serif;background:#f4f4f5;min-height:100dvh;
-            display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:24px;text-align:center}
-            h1{font-size:1.25rem;font-weight:800;color:#09090b;letter-spacing:-.03em}
-            p{font-size:.9375rem;color:#71717a;font-weight:500;max-width:260px;line-height:1.5}
-            button{margin-top:8px;padding:14px 28px;border-radius:999px;background:#09090b;color:#fff;
-            font-size:.9375rem;font-weight:800;border:none;cursor:pointer;font-family:inherit}
-        </style>
-    </head>
-    <body>
-        <h1>Sei offline</h1>
-        <p>Controlla la connessione e riprova.</p>
-        <button onclick="location.reload()">Riprova</button>
-    </body>
-</html>`, { headers: { 'Content-Type': 'text/html' } });
+        <html lang="it">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width,initial-scale=1">
+                <title>CALCIFER — Offline</title>
+                <style>
+                    *{margin:0;padding:0;box-sizing:border-box}
+                    body{font-family:-apple-system,'DM Sans',sans-serif;background:#f4f4f5;min-height:100dvh;
+                    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:24px;text-align:center}
+                    h1{font-size:1.25rem;font-weight:800;color:#09090b;letter-spacing:-.03em}
+                    p{font-size:.9375rem;color:#71717a;font-weight:500;max-width:260px;line-height:1.5}
+                    button{margin-top:8px;padding:14px 28px;border-radius:999px;background:#09090b;color:#fff;
+                    font-size:.9375rem;font-weight:800;border:none;cursor:pointer;font-family:inherit}
+                </style>
+            </head>
+            <body>
+                <h1>Sei offline</h1>
+                <p>Controlla la connessione e riprova.</p>
+                <button onclick="location.reload()">Riprova</button>
+            </body>
+        </html>`, { headers: { 'Content-Type': 'text/html' } });
 }

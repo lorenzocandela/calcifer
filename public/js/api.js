@@ -1,6 +1,6 @@
 const BASE = '/api';
 
-// token & user store
+// token + usr
 export const token = {
     get:   ()      => localStorage.getItem('cf_token'),
     set:   (t)     => {
@@ -12,7 +12,6 @@ export const token = {
         document.cookie = 'calcifer_auth=;max-age=0;path=/';
     },
 };
-
 export const userStore = {
     get:   ()    => JSON.parse(localStorage.getItem('cf_user') || 'null'),
     set:   (u)   => localStorage.setItem('cf_user', JSON.stringify(u)),
@@ -61,22 +60,22 @@ export const Auth = {
     },
 };
 
-// users
+// usr
 export const Users = {
     me() { return req('users.php', { action: 'me' }); },
 };
 
 // loans
 export const Loans = {
-    feed()                                  { return req('loans.php', { action: 'feed' }); },
-    mine()                                  { return req('loans.php', { action: 'mine' }); },
-    detail(id)                              { return req('loans.php', { action: 'detail', id }); },
+    feed() { return req('loans.php', { action: 'feed' }); },
+    mine() { return req('loans.php', { action: 'mine' }); },
+    detail(id) { return req('loans.php', { action: 'detail', id }); },
     create(amount, reason, duration_months) { return req('loans.php', { action: 'create', amount, reason, duration_months }); },
 };
 
 // chats
 export const Chats = {
-    list()                                              { return req('chats.php', { action: 'list' }); },
+    list() { return req('chats.php', { action: 'list' }); },
     create(loan_id, amount, duration_months, interest_rate) {
         return req('chats.php', { action: 'create', loan_id, amount, duration_months, interest_rate });
     },
@@ -85,9 +84,9 @@ export const Chats = {
 
 // messages
 export const Messages = {
-    fetch(chat_id)          { return req('messages.php', { action: 'fetch', chat_id }); },
-    send(chat_id, content)  { return req('messages.php', { action: 'send', chat_id, content }); },
-    markRead(chat_id)       { return req('messages.php', { action: 'mark_read', chat_id }); },
+    fetch(chat_id) { return req('messages.php', { action: 'fetch', chat_id }); },
+    send(chat_id, content) { return req('messages.php', { action: 'send', chat_id, content }); },
+    markRead(chat_id) { return req('messages.php', { action: 'mark_read', chat_id }); },
 };
 
 // proposals
@@ -103,7 +102,7 @@ export const Dashboard = {
 
 // notifications
 export const Notifications = {
-    list()                      { return req('notifications.php', { action: 'list' }); },
-    markRead(id, all = false)   { return req('notifications.php', { action: 'mark_read', notification_id: id, all }); },
-    deleteAll()                 { return req('notifications.php', { action: 'delete_all' }); },
+    list() { return req('notifications.php', { action: 'list' }); },
+    markRead(id, all = false) { return req('notifications.php', { action: 'mark_read', notification_id: id, all }); },
+    deleteAll() { return req('notifications.php', { action: 'delete_all' }); },
 };
