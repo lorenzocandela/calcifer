@@ -4,7 +4,7 @@ declare(strict_types=1);
 define('DB_HOST', '127.0.0.1');
 define('DB_NAME', 'calcifer');
 define('DB_USER', 'lorenzo');
-define('DB_PASS', '4k1r4B');
+define('DB_PASS', 'Lh34.56zz01');
 define('JWT_SECRET', '13689d96a981e5ddf4ea4e7b6e1019ba2e76fec15f0a16aae06030df547654fd');
 define('JWT_EXPIRY', 3600 * 24 * 7); // 7 gg per local TODO: allagare magari
 
